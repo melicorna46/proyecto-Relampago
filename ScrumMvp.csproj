@@ -179,16 +179,21 @@
     <Compile Include="Controllers\EquipoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProyectoController.cs" />
+    <Compile Include="Controllers\SprintController.cs" />
+    <Compile Include="Controllers\TableroController.cs" />
     <Compile Include="Data\Db.cs" />
     <Compile Include="Data\EquipoRepository.cs" />
     <Compile Include="Data\HistoriaRepository.cs" />
     <Compile Include="Data\ProyectoRepository.cs" />
+    <Compile Include="Data\SprintRepository.cs" />
+    <Compile Include="Data\TareaRepository.cs" />
     <Compile Include="Data\UsuarioRepository.cs" />
     <Compile Include="Filters\RequiereSesionAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\PrioridadHelper.cs" />
+    <Compile Include="Helpers\EstadoTareaHelper.cs" />
     <Compile Include="Helpers\RolesEquipo.cs" />
     <Compile Include="Models\AgregarMiembroViewModel.cs" />
     <Compile Include="Models\CrearEquipoViewModel.cs" />
@@ -201,6 +206,11 @@
     <Compile Include="Models\ProyectoConEquipoViewModel.cs" />
     <Compile Include="Models\ProyectoViewModel.cs" />
     <Compile Include="Models\RegistroViewModel.cs" />
+    <Compile Include="Models\Sprint.cs" />
+    <Compile Include="Models\SprintViewModel.cs" />
+    <Compile Include="Models\Tarea.cs" />
+    <Compile Include="Models\TareaTablero.cs" />
+    <Compile Include="Models\TareaViewModel.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Models\UsuarioSesion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -266,6 +276,12 @@
     <Content Include="Views\Backlog\Crear.cshtml" />
     <Content Include="Views\Backlog\Editar.cshtml" />
     <Content Include="Views\Proyecto\Index.cshtml" />
+    <Content Include="Views\Sprint\Index.cshtml" />
+    <Content Include="Views\Sprint\Crear.cshtml" />
+    <Content Include="Views\Sprint\Planificar.cshtml" />
+    <Content Include="Views\Sprint\SinSprint.cshtml" />
+    <Content Include="Views\Tablero\Index.cshtml" />
+    <Content Include="Views\Tablero\Crear.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

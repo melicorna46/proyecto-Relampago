@@ -193,5 +193,55 @@ namespace ScrumMvp.Data
                 }
             }
         }
+
+        // ================= Persona 2 · Sprint Backlog =================
+
+        // HU-058 + HU-061: el Sprint Backlog son las historias de este proyecto
+        // ya asignadas a un Sprint puntual (mismo mecanismo que el Product Backlog:
+        // sprint_id NULL = backlog, con valor = ya está en un Sprint).
+        public List<Historia> ObtenerPorSprint(int sprintId)
+        {
+            using (var con = Db.GetConnection())
+            {
+                string sql = @"
+                    SELECT id                    AS Id,
+                           proyecto_id            AS ProyectoId,
+                           sprint_id              AS SprintId,
+                           codigo                 AS Codigo,
+                           titulo                 AS Titulo,
+                           rol_como                AS RolComo,
+                           necesidad_quiero       AS NecesidadQuiero,
+                           proposito_para         AS PropositoPara,
+                           criterios_aceptacion   AS CriteriosAceptacion,
+                           prioridad              AS Prioridad,
+                           orden                  AS Orden,
+                           story_points           AS StoryPoints,
+                           estado                 AS Estado
+                    FROM historia
+                    WHERE sprint_id = @sprintId
+                    ORDER BY orden";
+
+                return new List<Historia>(con.Query<Historia>(sql, new { sprintId }));
+            }
+        }
+
+        // HU-058: Developers seleccionan historias del Product Backlog para el Sprint.
+        // El 'AND sprint_id IS NULL' evita que una historia que ya está en otro Sprint
+        // se reasigne por error.
+        public void AsignarASprint(IEnumerable<int> historiaIds, int sprintId)
+        {
+            using (var con = Db.GetConnection())
+            {
+                string sql = @"
+                    UPDATE historia
+                    SET sprint_id = @sprintId, estado = 'en_sprint'
+                    WHERE id = @id AND sprint_id IS NULL";
+
+                foreach (var id in historiaIds)
+                {
+                    con.Execute(sql, new { sprintId, id });
+                }
+            }
+        }
     }
 }

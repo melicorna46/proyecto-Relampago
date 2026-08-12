@@ -54,6 +54,10 @@ else
                                 </a>
                             }
 
+                            <a href="@Url.Action("Index", "Sprint", new { proyectoId = item.Proyecto.Id })" class="btn btn-outline-brand btn-sm">
+                                Ver Sprint
+                            </a>
+
                             <a href="@Url.Action("Index", "Backlog", new { proyectoId = item.Proyecto.Id })" class="btn btn-brand btn-sm">
                                 Ver Backlog
                             </a>
