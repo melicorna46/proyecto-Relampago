@@ -1,0 +1,73 @@
+﻿@model ScrumMvp.Models.HistoriaViewModel
+@{
+    ViewBag.Title = "Editar historia";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">
+                    Editar historia <code class="text-muted">@ViewBag.Codigo</code>
+                </h1>
+                <p class="text-muted mb-4">Actualizá los datos de esta historia del backlog.</p>
+
+                @using (Html.BeginForm("Editar", "Backlog", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Id)
+                    @Html.HiddenFor(m => m.ProyectoId)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Titulo)
+                        @Html.TextBoxFor(m => m.Titulo, new { @class = "form-control", autofocus = "autofocus" })
+                        @Html.ValidationMessageFor(m => m.Titulo, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m => m.RolComo)
+                            @Html.TextBoxFor(m => m.RolComo, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.RolComo, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m => m.NecesidadQuiero)
+                            @Html.TextBoxFor(m => m.NecesidadQuiero, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.NecesidadQuiero, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m => m.PropositoPara)
+                            @Html.TextBoxFor(m => m.PropositoPara, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PropositoPara, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.CriteriosAceptacion)
+                        @Html.TextAreaFor(m => m.CriteriosAceptacion, new { @class = "form-control", rows = 3 })
+                        @Html.ValidationMessageFor(m => m.CriteriosAceptacion, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            @Html.LabelFor(m => m.Prioridad)
+                            @Html.DropDownListFor(m => m.Prioridad, (List<SelectListItem>)ViewBag.Prioridades, new { @class = "form-select" })
+                            @Html.ValidationMessageFor(m => m.Prioridad, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            @Html.LabelFor(m => m.StoryPoints)
+                            @Html.DropDownList("StoryPoints", (List<SelectListItem>)ViewBag.StoryPointsOpciones, new { @class = "form-select" })
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Guardar cambios</button>
+                        <a href="@Url.Action("Index", "Backlog", new { proyectoId = Model.ProyectoId })" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

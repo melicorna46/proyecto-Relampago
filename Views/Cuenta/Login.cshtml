@@ -1,7 +1,37 @@
+﻿@model ScrumMvp.Models.LoginViewModel
 @{
     ViewBag.Title = "Iniciar sesión";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
-<div class="alert alert-info">
-    El login (HU-002) se arma en el siguiente paso. Por ahora este enlace es solo
-    para que la navegación no rompa mientras probás el registro.
-</div>
+
+<h2>Bienvenido de nuevo</h2>
+<p class="subtitle mb-4">Ingresá tus credenciales para acceder a tu equipo.</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success py-2">@TempData["Mensaje"]</div>
+}
+
+@using (Html.BeginForm("Login", "Cuenta", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger py-2" })
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Email, "Correo electrónico")
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "nombre@empresa.com", autofocus = "autofocus" })
+        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+    </div>
+
+    <div class="mb-4">
+        @Html.LabelFor(m => m.Password, "Contraseña")
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "••••••••" })
+        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+    </div>
+
+    <button type="submit" class="btn btn-brand w-100 mb-3">Ingresar</button>
+}
+
+<p class="text-center small text-muted mb-0">
+    ¿No tenés cuenta? <a class="auth-alt-link" href="@Url.Action("Registro", "Cuenta")">Creá una aquí</a>
+</p>

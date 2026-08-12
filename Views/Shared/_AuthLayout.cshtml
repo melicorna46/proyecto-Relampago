@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Scrum MVP</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --azul-marca: #2952E3;
+            --azul-oscuro: #16224E;
+            --azul-suave: #EEF2FF;
+            --gris-fondo: #FAFBFD;
+            --gris-borde: #E5E8F0;
+            --gris-texto: #6B7280;
+        }
+
+        * { font-family: 'Inter', sans-serif; }
+
+        body {
+            background: var(--gris-fondo);
+            min-height: 100vh;
+        }
+
+        .auth-wrapper { min-height: 100vh; }
+
+        /* Panel izquierdo: marca */
+        .auth-brand {
+            background: linear-gradient(160deg, var(--azul-marca) 0%, #1B3AC4 55%, var(--azul-oscuro) 100%);
+            color: #fff;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-brand::before {
+            content: "";
+            position: absolute;
+            width: 420px; height: 420px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            top: -120px; right: -140px;
+        }
+
+        .auth-brand::after {
+            content: "";
+            position: absolute;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            bottom: -100px; left: -80px;
+        }
+
+        .auth-brand-content { position: relative; z-index: 2; }
+
+        .auth-logo {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-brand h1 { font-weight: 800; font-size: 2.1rem; line-height: 1.25; }
+        .auth-brand p.lead { color: rgba(255,255,255,0.85); font-size: 1.02rem; }
+
+        .auth-feature { display: flex; align-items: flex-start; gap: .75rem; margin-top: 1.1rem; }
+        .auth-feature .dot { width: 8px; height: 8px; border-radius: 50%; background: #9DB0FF; margin-top: .5rem; flex-shrink: 0; }
+        .auth-feature span { color: rgba(255,255,255,0.9); font-size: .92rem; }
+
+        /* Panel derecho: formulario */
+        .auth-form-side {
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .auth-form-box { width: 100%; max-width: 420px; }
+        .auth-form-box h2 { font-weight: 700; color: var(--azul-oscuro); font-size: 1.6rem; }
+        .auth-form-box p.subtitle { color: var(--gris-texto); font-size: .95rem; }
+
+        .form-label { font-weight: 600; color: #374151; font-size: .88rem; }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid var(--gris-borde);
+            padding: .65rem .9rem;
+            font-size: .95rem;
+            background: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--azul-marca);
+            box-shadow: 0 0 0 .2rem rgba(41,82,227,.12);
+        }
+        .form-control::placeholder { color: #A9AFBC; }
+
+        .btn-brand {
+            background: var(--azul-marca);
+            border: none; color: #fff; font-weight: 600;
+            border-radius: 10px; padding: .7rem 1rem;
+            transition: background .15s ease;
+        }
+        .btn-brand:hover { background: #1F3FC2; color: #fff; }
+
+        .auth-alt-link { color: var(--azul-marca); font-weight: 600; text-decoration: none; }
+        .auth-alt-link:hover { text-decoration: underline; }
+
+        .badge-soft {
+            background: rgba(255,255,255,0.15); color: #fff; font-weight: 600;
+            border-radius: 999px; padding: .35rem .8rem; font-size: .78rem;
+            display: inline-block;
+        }
+
+        /* IMPORTANTE: oculta el contenedor de validación cuando no hay errores.
+           Sin esto, Html.ValidationSummary deja un <div> vacío visible
+           (el "cuadro rosado" en blanco) porque no estamos usando el
+           Site.css por defecto de MVC, que trae esta regla incluida. */
+        .validation-summary-valid,
+        .field-validation-valid {
+            display: none;
+        }
+
+        @@media (max-width: 767.98px) {
+            .auth-brand { padding: 2rem 1.5rem; text-align: center; }
+            .auth-brand-content { display: flex; flex-direction: column; align-items: center; }
+            .auth-feature { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid auth-wrapper">
+        <div class="row min-vh-100">
+            <div class="col-12 col-md-5 auth-brand d-flex align-items-center">
+                <div class="auth-brand-content">
+                    <div class="auth-logo">SM</div>
+                    <span class="badge-soft mb-3">Proyecto Relámpago</span>
+                    <h1>Gestión ágil de proyectos, simple y clara.</h1>
+                    <p class="lead mt-3">
+                        Organizá tu Product Backlog, planificá Sprints y seguí el avance
+                        de tu equipo en un solo lugar.
+                    </p>
+
+                    <div class="auth-feature"><div class="dot"></div><span>Backlog priorizado con historias y Story Points</span></div>
+                    <div class="auth-feature"><div class="dot"></div><span>Tablero Scrum en tiempo real</span></div>
+                    <div class="auth-feature"><div class="dot"></div><span>Daily, impedimentos y Definition of Done</span></div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-7 auth-form-side">
+                <div class="auth-form-box">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

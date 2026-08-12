@@ -1,0 +1,50 @@
+﻿@model ScrumMvp.Models.ProyectoViewModel
+@{
+    ViewBag.Title = "Nuevo proyecto";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">Crear proyecto</h1>
+                <p class="text-muted mb-4">Definí el producto sobre el que va a trabajar tu Scrum Team.</p>
+
+                @using (Html.BeginForm("Crear", "Proyecto", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Nombre)
+                        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control", placeholder = "Ej: AgroConecta", autofocus = "autofocus" })
+                        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.ProductGoal)
+                        @Html.TextAreaFor(m => m.ProductGoal, new { @class = "form-control", rows = 2, placeholder = "¿Qué se busca lograr con este producto?" })
+                        @Html.ValidationMessageFor(m => m.ProductGoal, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Vision)
+                        @Html.TextAreaFor(m => m.Vision, new { @class = "form-control", rows = 2, placeholder = "¿Qué querés que sea este producto a futuro?" })
+                        @Html.ValidationMessageFor(m => m.Vision, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.Descripcion)
+                        @Html.TextAreaFor(m => m.Descripcion, new { @class = "form-control", rows = 3, placeholder = "Alcance, problema que resuelve, contexto..." })
+                        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Crear proyecto</button>
+                        <a href="@Url.Action("Index", "Proyecto")" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
