@@ -1,0 +1,89 @@
+@model IEnumerable<ScrumMvp.Models.Burndown>
+@using System.Linq
+@using System.Globalization
+@{
+    ViewBag.Title = "Indicador ágil";
+    var sprint = (ScrumMvp.Models.Sprint)ViewBag.Sprint;
+    var cumplimiento = (ScrumMvp.Models.CumplimientoSprint)ViewBag.Cumplimiento;
+    var serie = Model.ToList();
+
+    string fechasJs = string.Join(",", serie.Select(b => "\"" + b.Fecha.ToString("dd/MM") + "\""));
+    string puntosJs = string.Join(",", serie.Select(b => b.PuntosRestantes.ToString(CultureInfo.InvariantCulture)));
+    string horasJs = string.Join(",", serie.Select(b => b.HorasRestantes.ToString(CultureInfo.InvariantCulture)));
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">Indicador ágil — @sprint.Nombre</h1>
+<p class="text-muted mb-4">
+    <a href="@Url.Action("Index", "Sprint", new { proyectoId = sprint.ProyectoId })" class="text-decoration-none">
+        ← Volver al Sprint
+    </a>
+</p>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" style="color:#16224E;">Cumplimiento del Sprint</h2>
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="progress flex-grow-1" style="height: 1.5rem;">
+                <div class="progress-bar btn-brand" role="progressbar" style="width: @cumplimiento.Porcentaje.ToString(CultureInfo.InvariantCulture)%; background: var(--azul-marca);">
+                    @cumplimiento.Porcentaje%
+                </div>
+            </div>
+            <span class="text-muted small text-nowrap">@cumplimiento.PuntosCompletados / @cumplimiento.TotalPuntos pts</span>
+        </div>
+        <p class="text-muted small mb-0">Story Points de historias Terminadas o Aceptadas sobre el total del Sprint.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" style="color:#16224E;">Burndown Chart</h2>
+
+        @if (!serie.Any())
+        {
+            <div class="empty-state">
+                <p class="mb-0">Todavía no hay puntos registrados para este Sprint.</p>
+            </div>
+        }
+        else
+        {
+            <canvas id="burndownChart" height="100"></canvas>
+        }
+    </div>
+</div>
+
+@section scripts {
+    @if (serie.Any())
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+        <script>
+            var ctx = document.getElementById('burndownChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [@Html.Raw(fechasJs)],
+                    datasets: [
+                        {
+                            label: 'Story Points restantes',
+                            data: [@Html.Raw(puntosJs)],
+                            borderColor: '#2952E3',
+                            backgroundColor: 'rgba(41,82,227,.1)',
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Horas restantes',
+                            data: [@Html.Raw(horasJs)],
+                            borderColor: '#16224E',
+                            backgroundColor: 'rgba(22,34,78,.1)',
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        </script>
+    }
+}

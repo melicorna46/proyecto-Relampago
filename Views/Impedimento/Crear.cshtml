@@ -1,0 +1,40 @@
+@model ScrumMvp.Models.ImpedimentoViewModel
+@{
+    ViewBag.Title = "Reportar impedimento";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">Reportar impedimento</h1>
+                <p class="text-muted mb-4">Contá qué te está bloqueando para que el equipo pueda ayudarte.</p>
+
+                @using (Html.BeginForm("Crear", "Impedimento", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.SprintId)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Descripcion)
+                        @Html.TextAreaFor(m => m.Descripcion, new { @class = "form-control", rows = 3, placeholder = "Ej: No puedo acceder al ambiente de pruebas." })
+                        @Html.ValidationMessageFor(m => m.Descripcion, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.Prioridad)
+                        @Html.DropDownListFor(m => m.Prioridad, (List<SelectListItem>)ViewBag.Prioridades, new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.Prioridad, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Reportar</button>
+                        <a href="@Url.Action("Index", "Impedimento", new { sprintId = Model.SprintId })" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

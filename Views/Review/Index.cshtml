@@ -1,0 +1,118 @@
+@model IEnumerable<ScrumMvp.Models.Historia>
+@using System.Linq
+@{
+    ViewBag.Title = "Sprint Review";
+    var sprint = (ScrumMvp.Models.Sprint)ViewBag.Sprint;
+    var review = (ScrumMvp.Models.SprintReview)ViewBag.Review;
+    var feedback = (List<ScrumMvp.Models.ReviewFeedback>)ViewBag.Feedback;
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">Sprint Review — @sprint.Nombre</h1>
+<p class="text-muted mb-4">
+    <a href="@Url.Action("Index", "Sprint", new { proyectoId = sprint.ProyectoId })" class="text-decoration-none">
+        ← Volver al Sprint
+    </a>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<h2 class="h5 mb-3" style="color:#16224E;">El incremento</h2>
+
+@if (!Model.Any())
+{
+    <div class="empty-state mb-4">
+        <h5 class="mb-2">Todavía no hay historias Terminadas en este Sprint</h5>
+        <p class="mb-0">Nada para mostrar en la Review por ahora.</p>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-2 mb-4">
+        @foreach (var h in Model)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body py-3 d-flex align-items-center gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <code class="text-muted">@h.Codigo</code>
+                            <span class="fw-semibold" style="color:#16224E;">@h.Titulo</span>
+                        </div>
+                        <p class="text-muted small mb-0">Como <strong>@h.RolComo</strong>, quiero @h.NecesidadQuiero</p>
+                    </div>
+                    <span class="badge @ScrumMvp.Helpers.EstadoHistoriaHelper.ClaseBadge(h.Estado) rounded-pill px-3 py-2">
+                        @ScrumMvp.Helpers.EstadoHistoriaHelper.Etiqueta(h.Estado)
+                    </span>
+                    @if (h.Estado == "terminada")
+                    {
+                        using (Html.BeginForm("Aceptar", "Review", new { sprintId = sprint.Id }, FormMethod.Post, new { style = "display:inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("historiaId", h.Id)
+                            <button type="submit" class="btn btn-sm btn-brand">Aceptar</button>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" style="color:#16224E;">Resultado de la Review</h2>
+        @using (Html.BeginForm("GuardarResultado", "Review", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("reviewId", review.Id)
+            @Html.Hidden("sprintId", sprint.Id)
+            <textarea name="resultado" class="form-control mb-2" rows="3"
+                      placeholder="Resumen de lo mostrado, decisiones tomadas...">@review.Resultado</textarea>
+            <button type="submit" class="btn btn-brand btn-sm">Guardar</button>
+        }
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" style="color:#16224E;">Feedback</h2>
+
+        @if (!feedback.Any())
+        {
+            <p class="text-muted small mb-3">Todavía no hay feedback registrado.</p>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-2 mb-3">
+                @foreach (var f in feedback)
+                {
+                    <div class="border rounded p-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold small" style="color:#16224E;">@f.Autor</span>
+                            <span class="text-muted small">@f.CreadoEn.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                        <p class="mb-0 small">@f.Comentario</p>
+                    </div>
+                }
+            </div>
+        }
+
+        @using (Html.BeginForm("AgregarFeedback", "Review", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("reviewId", review.Id)
+            @Html.Hidden("sprintId", sprint.Id)
+            <div class="d-flex gap-2">
+                <textarea name="comentario" class="form-control" rows="2" placeholder="Tu comentario..."></textarea>
+                <button type="submit" class="btn btn-outline-brand text-nowrap">Agregar</button>
+            </div>
+        }
+    </div>
+</div>

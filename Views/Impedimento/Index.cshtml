@@ -1,0 +1,103 @@
+@model IEnumerable<ScrumMvp.Models.ImpedimentoConUsuario>
+@using System.Linq
+@{
+    ViewBag.Title = "Impedimentos";
+    var sprint = (ScrumMvp.Models.Sprint)ViewBag.Sprint;
+    var usuarioActual = (ScrumMvp.Models.UsuarioSesion)Session["UsuarioActual"];
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">Impedimentos — @sprint.Nombre</h1>
+<p class="text-muted mb-4">
+    <a href="@Url.Action("Index", "Sprint", new { proyectoId = sprint.ProyectoId })" class="text-decoration-none">
+        ← Volver al Sprint
+    </a>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="mb-4">
+    <a href="@Url.Action("Crear", "Impedimento", new { sprintId = sprint.Id })" class="btn btn-brand btn-sm">
+        + Reportar impedimento
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5 class="mb-2">No hay impedimentos registrados</h5>
+        <p class="mb-0">Cuando algo te bloquee, reportalo acá.</p>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-2">
+        @foreach (var i in Model)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge @ScrumMvp.Helpers.EstadoImpedimentoHelper.ClaseBadge(i.Estado) rounded-pill px-3 py-2">
+                                @ScrumMvp.Helpers.EstadoImpedimentoHelper.Etiqueta(i.Estado)
+                            </span>
+                            <span class="badge @ScrumMvp.Helpers.PrioridadHelper.ClaseBadge(i.Prioridad) rounded-pill px-3 py-2">
+                                @ScrumMvp.Helpers.PrioridadHelper.Etiqueta(i.Prioridad)
+                            </span>
+                        </div>
+                        <span class="text-muted small">Reportado por @i.ReportadoPorNombre — @i.FechaApertura.ToString("dd/MM/yyyy")</span>
+                    </div>
+
+                    <p class="mb-2" style="color:#16224E;">@i.Descripcion</p>
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-muted small">
+                            @if (i.ResponsableId.HasValue)
+                            {
+                                <text>👤 Gestiona: @(i.ResponsableId == usuarioActual.Id ? "Vos" : i.ResponsableNombre)</text>
+                            }
+                            else
+                            {
+                                <text>Sin responsable todavía</text>
+                            }
+                            @if (i.FechaResolucion.HasValue)
+                            {
+                                <text> · Resuelto el @i.FechaResolucion.Value.ToString("dd/MM/yyyy")</text>
+                            }
+                        </span>
+
+                        <div class="d-flex gap-2">
+                            @if (i.Estado != "resuelto" && !i.ResponsableId.HasValue)
+                            {
+                                using (Html.BeginForm("Tomar", "Impedimento", new { sprintId = sprint.Id }, FormMethod.Post, new { style = "display:inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("impedimentoId", i.Id)
+                                    <button type="submit" class="btn btn-sm btn-outline-brand">Lo tomo yo</button>
+                                }
+                            }
+                            @if (i.Estado != "resuelto")
+                            {
+                                using (Html.BeginForm("AvanzarEstado", "Impedimento", new { sprintId = sprint.Id }, FormMethod.Post, new { style = "display:inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("impedimentoId", i.Id)
+                                    <button type="submit" class="btn btn-sm btn-brand">
+                                        @(i.Estado == "abierto" ? "Poner en gestión" : "Marcar resuelto")
+                                    </button>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

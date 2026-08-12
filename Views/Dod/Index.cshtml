@@ -1,0 +1,69 @@
+@model IEnumerable<ScrumMvp.Models.DodCriterio>
+@using System.Linq
+@{
+    ViewBag.Title = "Definition of Done";
+    int proyectoId = (int)ViewBag.ProyectoId;
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">Definition of Done</h1>
+<p class="text-muted mb-4">
+    <a href="@Url.Action("Index", "Backlog", new { proyectoId })" class="text-decoration-none">
+        ← Volver al Product Backlog
+    </a>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" style="color:#16224E;">Agregar criterio</h2>
+        @using (Html.BeginForm("Crear", "Dod", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("ProyectoId", proyectoId)
+            <div class="d-flex gap-2">
+                @Html.TextBox("Descripcion", "", new { @class = "form-control", placeholder = "Ej: El código pasó revisión de otro Developer." })
+                <button type="submit" class="btn btn-brand text-nowrap">Agregar</button>
+            </div>
+        }
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5 class="mb-2">Todavía no hay criterios definidos</h5>
+        <p class="mb-0">El equipo tiene que acordar qué significa "Terminado" antes de cerrar historias.</p>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-2">
+        @foreach (var c in Model)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body py-2 d-flex align-items-center justify-content-between">
+                    <span style="color:#16224E;">@c.Descripcion</span>
+                    @using (Html.BeginForm("Eliminar", "Dod", FormMethod.Post, new { style = "display:inline" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", c.Id)
+                        @Html.Hidden("proyectoId", proyectoId)
+                        <button type="submit" class="btn btn-sm btn-outline-brand"
+                                onclick="return confirm('¿Eliminar este criterio de la Definition of Done?');">
+                            Eliminar
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

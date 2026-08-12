@@ -11,10 +11,13 @@
         <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
         <h1 class="h3 mb-0" style="color:#16224E; font-weight:700;">Product Backlog</h1>
     </div>
-    @if (esProductOwner)
-    {
-        <a href="@Url.Action("Crear", "Backlog", new { proyectoId })" class="btn btn-brand">+ Nueva historia</a>
-    }
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Index", "Dod", new { proyectoId })" class="btn btn-outline-brand">Definition of Done</a>
+        @if (esProductOwner)
+        {
+            <a href="@Url.Action("Crear", "Backlog", new { proyectoId })" class="btn btn-brand">+ Nueva historia</a>
+        }
+    </div>
 </div>
 
 @if (!esProductOwner)

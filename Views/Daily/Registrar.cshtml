@@ -1,0 +1,51 @@
+@model ScrumMvp.Models.DailyViewModel
+@{
+    ViewBag.Title = "Mi Daily de hoy";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">Mi Daily de hoy</h1>
+                <p class="text-muted mb-4">¿Qué avancé, qué voy a hacer y hay algo que me esté trabando?</p>
+
+                @using (Html.BeginForm("Registrar", "Daily", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.SprintId)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.QueAvance)
+                        @Html.TextAreaFor(m => m.QueAvance, new { @class = "form-control", rows = 2, placeholder = "Qué hice desde el último Daily..." })
+                        @Html.ValidationMessageFor(m => m.QueAvance, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.QueHare)
+                        @Html.TextAreaFor(m => m.QueHare, new { @class = "form-control", rows = 2, placeholder = "Qué voy a hacer hoy..." })
+                        @Html.ValidationMessageFor(m => m.QueHare, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="form-check mb-3">
+                        @Html.CheckBoxFor(m => m.TieneImpedimento, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.TieneImpedimento, new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.ImpedimentoTexto)
+                        @Html.TextAreaFor(m => m.ImpedimentoTexto, new { @class = "form-control", rows = 2, placeholder = "Contá qué te está frenando..." })
+                        @Html.ValidationMessageFor(m => m.ImpedimentoTexto, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Guardar Daily</button>
+                        <a href="@Url.Action("Index", "Daily", new { sprintId = Model.SprintId })" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

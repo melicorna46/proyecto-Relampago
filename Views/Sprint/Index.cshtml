@@ -34,6 +34,21 @@
     <a href="@Url.Action("Index", "Tablero", new { sprintId = sprint.Id })" class="btn btn-brand btn-sm">
         Ver Tablero
     </a>
+    <a href="@Url.Action("Index", "Daily", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
+        Daily Scrum
+    </a>
+    <a href="@Url.Action("Index", "Impedimento", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
+        Impedimentos
+    </a>
+    <a href="@Url.Action("Index", "Review", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
+        Review
+    </a>
+    <a href="@Url.Action("Index", "Retro", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
+        Retrospectiva
+    </a>
+    <a href="@Url.Action("Index", "Indicador", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
+        Indicador ágil
+    </a>
     @if (esScrumMaster && sprint.Estado != "cerrado")
     {
         <a href="@Url.Action("Planificar", "Sprint", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
@@ -86,6 +101,10 @@ else
                     {
                         <span class="badge text-bg-light text-dark border">@h.StoryPoints pts</span>
                     }
+                    <span class="badge @ScrumMvp.Helpers.EstadoHistoriaHelper.ClaseBadge(h.Estado) rounded-pill px-3 py-2">
+                        @ScrumMvp.Helpers.EstadoHistoriaHelper.Etiqueta(h.Estado)
+                    </span>
+                    <a href="@Url.Action("Checklist", "Dod", new { historiaId = h.Id })" class="btn btn-sm btn-outline-brand">DoD</a>
                 </div>
             </div>
         }

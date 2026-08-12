@@ -1,0 +1,124 @@
+@model IEnumerable<ScrumMvp.Models.RetroItemConUsuario>
+@using System.Linq
+@{
+    ViewBag.Title = "Retrospectiva";
+    var sprint = (ScrumMvp.Models.Sprint)ViewBag.Sprint;
+    var retro = (ScrumMvp.Models.Retrospectiva)ViewBag.Retro;
+    var usuarioActual = (ScrumMvp.Models.UsuarioSesion)Session["UsuarioActual"];
+    var problemas = Model.Where(i => i.Tipo == "problema").ToList();
+    var acciones = Model.Where(i => i.Tipo == "accion").ToList();
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">Retrospectiva — @sprint.Nombre</h1>
+<p class="text-muted mb-4">
+    <a href="@Url.Action("Index", "Sprint", new { proyectoId = sprint.ProyectoId })" class="text-decoration-none">
+        ← Volver al Sprint
+    </a>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="row g-3">
+    <div class="col-12 col-lg-6">
+        <h2 class="h5 mb-3" style="color:#16224E;">Problemas</h2>
+
+        <div class="d-flex flex-column gap-2 mb-3">
+            @if (!problemas.Any())
+            {
+                <div class="empty-state py-3">
+                    <p class="mb-0 small">Todavía no se registró ningún problema.</p>
+                </div>
+            }
+            @foreach (var item in problemas)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body py-2">
+                        <p class="mb-0 small">@item.Descripcion</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @using (Html.BeginForm("CrearProblema", "Retro", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("retrospectivaId", retro.Id)
+            @Html.Hidden("sprintId", sprint.Id)
+            <div class="d-flex gap-2">
+                <textarea name="descripcion" class="form-control" rows="2" placeholder="¿Qué no funcionó bien?"></textarea>
+                <button type="submit" class="btn btn-outline-brand text-nowrap">Agregar</button>
+            </div>
+        }
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <h2 class="h5 mb-3" style="color:#16224E;">Acciones de mejora</h2>
+
+        <div class="d-flex flex-column gap-2 mb-3">
+            @if (!acciones.Any())
+            {
+                <div class="empty-state py-3">
+                    <p class="mb-0 small">Todavía no se propuso ninguna acción.</p>
+                </div>
+            }
+            @foreach (var item in acciones)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge @ScrumMvp.Helpers.EstadoRetroItemHelper.ClaseBadge(item.Estado) rounded-pill px-3 py-2">
+                                @ScrumMvp.Helpers.EstadoRetroItemHelper.Etiqueta(item.Estado)
+                            </span>
+                            <span class="text-muted small">
+                                @if (item.ResponsableId.HasValue)
+                                {
+                                    <text>👤 @(item.ResponsableId == usuarioActual.Id ? "Vos" : item.ResponsableNombre)</text>
+                                }
+                            </span>
+                        </div>
+                        <p class="mb-2 small">@item.Descripcion</p>
+
+                        <div class="d-flex gap-2">
+                            @if (!item.ResponsableId.HasValue)
+                            {
+                                using (Html.BeginForm("Tomar", "Retro", new { sprintId = sprint.Id }, FormMethod.Post, new { style = "display:inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("itemId", item.Id)
+                                    <button type="submit" class="btn btn-sm btn-outline-brand py-0">La tomo yo</button>
+                                }
+                            }
+                            using (Html.BeginForm("CambiarEstado", "Retro", new { sprintId = sprint.Id }, FormMethod.Post, new { style = "display:inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("itemId", item.Id)
+                                @Html.DropDownList("nuevoEstado",
+                                         ScrumMvp.Helpers.EstadoRetroItemHelper.ComoLista(item.Estado),
+                                         new { @class = "form-select form-select-sm py-0", onchange = "this.form.submit()" })
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @using (Html.BeginForm("CrearAccion", "Retro", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("retrospectivaId", retro.Id)
+            @Html.Hidden("sprintId", sprint.Id)
+            <div class="d-flex gap-2">
+                <textarea name="descripcion" class="form-control" rows="2" placeholder="¿Qué vamos a probar el próximo Sprint?"></textarea>
+                <button type="submit" class="btn btn-outline-brand text-nowrap">Agregar</button>
+            </div>
+        }
+    </div>
+</div>
