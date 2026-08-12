@@ -30,7 +30,7 @@ Done, Review, Retrospective e indicador de avance (Burndown).
 | Hosting             | Plesk / IIS                                  |
 | Control de versiones | Git / GitHub                               |
 
-## ⚙️ Configuración
+##  Configuración
 
 1. Clonar el repositorio y abrir `ScrumMvp.sln` en Visual Studio.
 2. Restaurar el paquete NuGet `MySql.Data` si no se restaura automáticamente.
