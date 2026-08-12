@@ -1,0 +1,81 @@
+@model IEnumerable<ScrumMvp.Models.DodChecklistItem>
+@using System.Linq
+@{
+    ViewBag.Title = "Checklist DoD";
+    var historia = (ScrumMvp.Models.Historia)ViewBag.Historia;
+    int pendientes = (int)ViewBag.PendientesCount;
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">
+    Definition of Done — <code>@historia.Codigo</code> @historia.Titulo
+</h1>
+<p class="text-muted mb-4">
+    Estado actual:
+    <span class="badge @ScrumMvp.Helpers.EstadoHistoriaHelper.ClaseBadge(historia.Estado) rounded-pill px-3 py-2">
+        @ScrumMvp.Helpers.EstadoHistoriaHelper.Etiqueta(historia.Estado)
+    </span>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state mb-4">
+        <h5 class="mb-2">El proyecto todavía no tiene una Definition of Done</h5>
+        <p class="mb-0">Definí los criterios primero para poder verificar esta historia.</p>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+            @foreach (var item in Model)
+            {
+                using (Html.BeginForm("MarcarCumplido", "Dod", FormMethod.Post, new { @class = "mb-2" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("historiaId", historia.Id)
+                    @Html.Hidden("dodCriterioId", item.DodCriterioId)
+                    @Html.Hidden("cumplido", !item.Cumplido)
+                    <div class="form-check d-flex align-items-center gap-2">
+                        <input type="checkbox" class="form-check-input" @(item.Cumplido ? "checked=\"checked\"" : "")
+                               onchange="this.form.submit()" />
+                        <label class="form-check-label @(item.Cumplido ? "text-decoration-line-through text-muted" : "")">
+                            @item.Descripcion
+                        </label>
+                        @if (item.Cumplido && !string.IsNullOrEmpty(item.VerificadoPorNombre))
+                        {
+                            <span class="text-muted small">— verificado por @item.VerificadoPorNombre</span>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        @if (historia.Estado != "terminada" && historia.Estado != "aceptada")
+        {
+            using (Html.BeginForm("Terminar", "Dod", FormMethod.Post, new { style = "display:inline" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("historiaId", historia.Id)
+                <button type="submit" class="btn btn-brand" disabled="@(pendientes > 0 ? "disabled" : null)">
+                    Marcar historia como Terminada
+                </button>
+            }
+            if (pendientes > 0)
+            {
+                <span class="text-muted small">Faltan @pendientes criterio(s) por cumplir.</span>
+            }
+        }
+    </div>
+}

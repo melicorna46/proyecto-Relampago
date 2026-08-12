@@ -243,5 +243,18 @@ namespace ScrumMvp.Data
                 }
             }
         }
+
+        // ================= Persona 3 · DoD y Review =================
+
+        // HU-086 + HU-099: transición de estado validada desde afuera (DoD completo
+        // para pasar a 'terminada', Sprint Review para pasar a 'aceptada').
+        public void CambiarEstado(int id, string nuevoEstado)
+        {
+            using (var con = Db.GetConnection())
+            {
+                string sql = @"UPDATE historia SET estado = @nuevoEstado WHERE id = @id";
+                con.Execute(sql, new { id, nuevoEstado });
+            }
+        }
     }
 }
