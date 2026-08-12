@@ -1,0 +1,45 @@
+﻿@model ScrumMvp.Models.CrearEquipoViewModel
+@{
+    ViewBag.Title = "Crear equipo";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-7">
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">Crear equipo Scrum</h1>
+                <p class="text-muted mb-4">Vas a ser el primer miembro de este equipo.</p>
+
+                @using (Html.BeginForm("Crear", "Equipo", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ProyectoId)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Nombre)
+                        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control", placeholder = "Ej: Scrum Team AgroConecta", autofocus = "autofocus" })
+                        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.RolCreador)
+                        @Html.DropDownListFor(
+                            m => m.RolCreador,
+                            (List<SelectListItem>)ViewBag.Roles,
+                            "Seleccioná tu rol...",
+                            new { @class = "form-select" }
+                        )
+                        @Html.ValidationMessageFor(m => m.RolCreador, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Crear equipo</button>
+                        <a href="@Url.Action("Index", "Proyecto")" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+﻿@model ScrumMvp.Models.HistoriaViewModel
+@{
+    ViewBag.Title = "Nueva historia";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">Nueva historia de usuario</h1>
+                <p class="text-muted mb-4">El código se asigna automáticamente al guardar.</p>
+
+                @using (Html.BeginForm("Crear", "Backlog", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ProyectoId)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Titulo)
+                        @Html.TextBoxFor(m => m.Titulo, new { @class = "form-control", placeholder = "Ej: Publicar producto", autofocus = "autofocus" })
+                        @Html.ValidationMessageFor(m => m.Titulo, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m => m.RolComo)
+                            @Html.TextBoxFor(m => m.RolComo, new { @class = "form-control", placeholder = "productor" })
+                            @Html.ValidationMessageFor(m => m.RolComo, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m => m.NecesidadQuiero)
+                            @Html.TextBoxFor(m => m.NecesidadQuiero, new { @class = "form-control", placeholder = "publicar un producto" })
+                            @Html.ValidationMessageFor(m => m.NecesidadQuiero, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m => m.PropositoPara)
+                            @Html.TextBoxFor(m => m.PropositoPara, new { @class = "form-control", placeholder = "ofrecerlo a los compradores" })
+                            @Html.ValidationMessageFor(m => m.PropositoPara, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.CriteriosAceptacion)
+                        @Html.TextAreaFor(m => m.CriteriosAceptacion, new { @class = "form-control", rows = 3, placeholder = "- Requiere nombre y precio\n- Aparece en el catálogo al guardar" })
+                        @Html.ValidationMessageFor(m => m.CriteriosAceptacion, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            @Html.LabelFor(m => m.Prioridad)
+                            @Html.DropDownListFor(m => m.Prioridad, (List<SelectListItem>)ViewBag.Prioridades, new { @class = "form-select" })
+                            @Html.ValidationMessageFor(m => m.Prioridad, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            @Html.LabelFor(m => m.StoryPoints)
+                            @Html.DropDownList("StoryPoints", (List<SelectListItem>)ViewBag.StoryPointsOpciones, new { @class = "form-select" })
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Agregar al backlog</button>
+                        <a href="@Url.Action("Index", "Backlog", new { proyectoId = Model.ProyectoId })" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+﻿@model IEnumerable<ScrumMvp.Models.Historia>
+@using System.Linq
+@{
+    ViewBag.Title = "Product Backlog";
+    int proyectoId = (int)ViewBag.ProyectoId;
+    bool esProductOwner = (bool)ViewBag.EsProductOwner;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <div>
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <h1 class="h3 mb-0" style="color:#16224E; font-weight:700;">Product Backlog</h1>
+    </div>
+    @if (esProductOwner)
+    {
+        <a href="@Url.Action("Crear", "Backlog", new { proyectoId })" class="btn btn-brand">+ Nueva historia</a>
+    }
+</div>
+
+@if (!esProductOwner)
+{
+    <div class="alert alert-info mt-3 mb-0">
+        Estás viendo el backlog en modo lectura. Solo el <strong>Product Owner</strong> del equipo
+        puede crear, editar o reordenar historias.
+    </div>
+}
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state mt-4">
+        <h5 class="mb-2">El backlog está vacío</h5>
+        @if (esProductOwner)
+        {
+            <p class="mb-3">Agregá la primera historia para empezar a priorizar el trabajo.</p>
+            <a href="@Url.Action("Crear", "Backlog", new { proyectoId })" class="btn btn-brand">Agregar historia</a>
+        }
+        else
+        {
+            <p class="mb-0">El Product Owner todavía no cargó historias.</p>
+        }
+    </div>
+}
+else
+{
+    <div class="mt-4 d-flex flex-column gap-2">
+        @{ var lista = Model.ToList(); }
+        @for (int i = 0; i < lista.Count; i++)
+        {
+            var h = lista[i];
+            <div class="card shadow-sm">
+                <div class="card-body py-3 d-flex align-items-center gap-3">
+
+                    @if (esProductOwner)
+                    {
+                        <div class="d-flex flex-column">
+                            @using (Html.BeginForm("MoverArriba", "Backlog", FormMethod.Post, new { style = "display:inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", h.Id)
+                                @Html.Hidden("proyectoId", proyectoId)
+                                <button type="submit" class="btn btn-sm btn-outline-brand py-0 px-2 mb-1" style="@(i == 0 ? "visibility:hidden" : "")" title="Subir prioridad">▲</button>
+                            }
+                            @using (Html.BeginForm("MoverAbajo", "Backlog", FormMethod.Post, new { style = "display:inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", h.Id)
+                                @Html.Hidden("proyectoId", proyectoId)
+                                <button type="submit" class="btn btn-sm btn-outline-brand py-0 px-2" style="@(i == lista.Count - 1 ? "visibility:hidden" : "")" title="Bajar prioridad">▼</button>
+                            }
+                        </div>
+                    }
+
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <code class="text-muted">@h.Codigo</code>
+                            <span class="fw-semibold" style="color:#16224E;">@h.Titulo</span>
+                        </div>
+                        <p class="text-muted small mb-0">
+                            Como <strong>@h.RolComo</strong>, quiero @h.NecesidadQuiero
+                            @if (!string.IsNullOrEmpty(h.PropositoPara))
+                            {
+                                <text>, para @h.PropositoPara</text>
+                            }
+                        </p>
+                    </div>
+
+                    <span class="badge @ScrumMvp.Helpers.PrioridadHelper.ClaseBadge(h.Prioridad) rounded-pill px-3 py-2">
+                        @ScrumMvp.Helpers.PrioridadHelper.Etiqueta(h.Prioridad)
+                    </span>
+
+                    @if (h.StoryPoints.HasValue)
+                    {
+                        <span class="badge text-bg-light text-dark border">@h.StoryPoints pts</span>
+                    }
+
+                    @if (esProductOwner)
+                    {
+                        <a href="@Url.Action("Editar", "Backlog", new { id = h.Id })" class="btn btn-sm btn-outline-brand">Editar</a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

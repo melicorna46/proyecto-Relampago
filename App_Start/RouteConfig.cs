@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace ScrumMvp
@@ -16,7 +12,9 @@ namespace ScrumMvp
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                // La app abre en el Login: es el punto de entrada natural
+                // (si no hay sesión, ninguna otra pantalla debería verse igual).
+                defaults: new { controller = "Cuenta", action = "Login", id = UrlParameter.Optional }
             );
         }
     }

@@ -1,0 +1,82 @@
+﻿@model IEnumerable<ScrumMvp.Models.MiembroEquipo>
+@using System.Linq
+@{
+    var equipo = (ScrumMvp.Models.Equipo)ViewBag.Equipo;
+    ViewBag.Title = equipo.Nombre;
+
+    // Si venimos de un error en "Agregar miembro", recuperamos lo que la persona
+    // había escrito para no hacerle perder el texto ya tipeado.
+    var modeloAgregar = ViewBag.ModeloAgregar as ScrumMvp.Models.AgregarMiembroViewModel
+                         ?? new ScrumMvp.Models.AgregarMiembroViewModel { EquipoId = equipo.Id };
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-4" style="color:#16224E; font-weight:700;">@equipo.Nombre</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<div class="row g-4">
+    <!-- Columna izquierda: miembros actuales -->
+    <div class="col-12 col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="h6 mb-3" style="color:#16224E; font-weight:700;">
+                    Miembros del equipo
+                    <span class="badge text-bg-light text-muted ms-1">@Model.Count()</span>
+                </h2>
+
+                @foreach (var m in Model)
+                {
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div>
+                            <div class="fw-semibold" style="color:#16224E;">@m.Nombre</div>
+                            <div class="text-muted small">@m.Email</div>
+                        </div>
+                        <span class="badge @ScrumMvp.Helpers.RolesEquipo.ClaseBadge(m.Rol) rounded-pill px-3 py-2">
+                            @ScrumMvp.Helpers.RolesEquipo.Etiqueta(m.Rol)
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Columna derecha: agregar nuevo miembro -->
+    <div class="col-12 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="h6 mb-1" style="color:#16224E; font-weight:700;">Agregar integrante</h2>
+                <p class="text-muted small mb-3">Debe tener una cuenta creada previamente.</p>
+
+                @using (Html.BeginForm("AgregarMiembro", "Equipo", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("EquipoId", equipo.Id)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger py-2" })
+
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        @Html.TextBox("Email", modeloAgregar.Email, new { @class = "form-control", type = "email", placeholder = "nombre@empresa.com" })
+                        @Html.ValidationMessage("Email", "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Rol en el equipo</label>
+                        @Html.DropDownList(
+                            "Rol",
+                            (List<SelectListItem>)ViewBag.Roles,
+                            "Seleccioná un rol...",
+                            new { @class = "form-select" }
+                        )
+                        @Html.ValidationMessage("Rol", "", new { @class = "text-danger small" })
+                    </div>
+
+                    <button type="submit" class="btn btn-brand w-100">Agregar al equipo</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
