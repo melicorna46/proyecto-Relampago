@@ -56,7 +56,7 @@ Done, Review, Retrospective e indicador de avance (Burndown).
 
 | Rol            | Usuario (email) | Contraseña |
 |-----------------|------------------|------------|
-| Product Owner   | jph1@cuc.ac.cr   | admin123   |
+| Product Owner   | jph@cuc.ac.cr   | admin123   |
 | Scrum Master    | jph1@cuc.ac.cr   | admin123   |
 | Developer       | jph2@cuc.ac.cr   | admin123   |
 
