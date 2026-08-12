@@ -1,0 +1,53 @@
+@model ScrumMvp.Models.SprintViewModel
+@{
+    ViewBag.Title = "Nuevo Sprint";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-1" style="color:#16224E; font-weight:700;">Nuevo Sprint</h1>
+                <p class="text-muted mb-4">Definí el Sprint Goal: qué querés lograr con este Sprint.</p>
+
+                @using (Html.BeginForm("Crear", "Sprint", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ProyectoId)
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Nombre)
+                        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control", placeholder = "Sprint 1", autofocus = "autofocus" })
+                        @Html.ValidationMessageFor(m => m.Nombre, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.SprintGoal)
+                        @Html.TextAreaFor(m => m.SprintGoal, new { @class = "form-control", rows = 2, placeholder = "Ej: Permitir a un usuario registrarse y publicar su primer producto." })
+                        @Html.ValidationMessageFor(m => m.SprintGoal, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            @Html.LabelFor(m => m.FechaInicio)
+                            @Html.TextBoxFor(m => m.FechaInicio, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.FechaInicio, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            @Html.LabelFor(m => m.FechaFin)
+                            @Html.TextBoxFor(m => m.FechaFin, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.FechaFin, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-brand">Crear Sprint</button>
+                        <a href="@Url.Action("Index", "Sprint", new { proyectoId = Model.ProyectoId })" class="btn btn-outline-brand">Cancelar</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

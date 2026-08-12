@@ -1,0 +1,93 @@
+@model IEnumerable<ScrumMvp.Models.Historia>
+@using System.Linq
+@{
+    ViewBag.Title = "Sprint";
+    int proyectoId = (int)ViewBag.ProyectoId;
+    bool esScrumMaster = (bool)ViewBag.EsScrumMaster;
+    var sprint = (ScrumMvp.Models.Sprint)ViewBag.Sprint;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-1">
+    <div>
+        <p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+        <h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">@sprint.Nombre</h1>
+        <p class="text-muted mb-0">Sprint Goal: <strong>@sprint.SprintGoal</strong></p>
+        <p class="text-muted small mb-0">
+            @sprint.FechaInicio.Value.ToString("dd/MM/yyyy") — @sprint.FechaFin.Value.ToString("dd/MM/yyyy")
+        </p>
+    </div>
+    <span class="badge @(sprint.Estado == "activo" ? "text-bg-success" : sprint.Estado == "planificado" ? "text-bg-warning" : "text-bg-secondary") rounded-pill px-3 py-2">
+        @sprint.Estado
+    </span>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}
+
+<div class="d-flex gap-2 mt-3 mb-4">
+    <a href="@Url.Action("Index", "Tablero", new { sprintId = sprint.Id })" class="btn btn-brand btn-sm">
+        Ver Tablero
+    </a>
+    @if (esScrumMaster && sprint.Estado != "cerrado")
+    {
+        <a href="@Url.Action("Planificar", "Sprint", new { sprintId = sprint.Id })" class="btn btn-outline-brand btn-sm">
+            + Agregar historias al Sprint Backlog
+        </a>
+        using (Html.BeginForm("Cerrar", "Sprint", FormMethod.Post, new { style = "display:inline" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("sprintId", sprint.Id)
+            @Html.Hidden("proyectoId", proyectoId)
+            <button type="submit" class="btn btn-outline-brand btn-sm"
+                    onclick="return confirm('¿Cerrar este Sprint? No vas a poder agregar más historias.');">
+                Cerrar Sprint
+            </button>
+        }
+    }
+</div>
+
+<h2 class="h5 mb-3" style="color:#16224E;">Sprint Backlog</h2>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h5 class="mb-2">Todavía no hay historias en el Sprint Backlog</h5>
+        @if (esScrumMaster)
+        {
+            <p class="mb-3">Seleccioná historias del Product Backlog para empezar.</p>
+            <a href="@Url.Action("Planificar", "Sprint", new { sprintId = sprint.Id })" class="btn btn-brand">Seleccionar historias</a>
+        }
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-2">
+        @foreach (var h in Model)
+        {
+            <div class="card shadow-sm">
+                <div class="card-body py-3 d-flex align-items-center gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <code class="text-muted">@h.Codigo</code>
+                            <span class="fw-semibold" style="color:#16224E;">@h.Titulo</span>
+                        </div>
+                        <p class="text-muted small mb-0">Como <strong>@h.RolComo</strong>, quiero @h.NecesidadQuiero</p>
+                    </div>
+                    <span class="badge @ScrumMvp.Helpers.PrioridadHelper.ClaseBadge(h.Prioridad) rounded-pill px-3 py-2">
+                        @ScrumMvp.Helpers.PrioridadHelper.Etiqueta(h.Prioridad)
+                    </span>
+                    @if (h.StoryPoints.HasValue)
+                    {
+                        <span class="badge text-bg-light text-dark border">@h.StoryPoints pts</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

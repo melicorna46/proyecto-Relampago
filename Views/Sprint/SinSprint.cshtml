@@ -1,0 +1,30 @@
+@{
+    ViewBag.Title = "Sprint";
+    int proyectoId = (int)ViewBag.ProyectoId;
+    bool esScrumMaster = (bool)ViewBag.EsScrumMaster;
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-4" style="color:#16224E; font-weight:700;">Sprint</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="empty-state">
+    <h5 class="mb-2">Todavía no hay un Sprint en curso</h5>
+    @if (esScrumMaster)
+    {
+        <p class="mb-3">Creá el Sprint y definí el Sprint Goal para empezar a planificar.</p>
+        <a href="@Url.Action("Crear", "Sprint", new { proyectoId })" class="btn btn-brand">Crear Sprint</a>
+    }
+    else
+    {
+        <p class="mb-0">El Scrum Master todavía no creó el Sprint.</p>
+    }
+</div>

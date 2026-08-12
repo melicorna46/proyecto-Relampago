@@ -1,0 +1,115 @@
+@model IEnumerable<ScrumMvp.Models.TareaTablero>
+@using System.Linq
+@{
+    ViewBag.Title = "Tablero";
+    var sprint = (ScrumMvp.Models.Sprint)ViewBag.Sprint;
+    var historiasDelSprint = (List<ScrumMvp.Models.Historia>)ViewBag.HistoriasDelSprint;
+    var columnas = ScrumMvp.Helpers.EstadoTareaHelper.Columnas();
+    var usuarioActual = (ScrumMvp.Models.UsuarioSesion)Session["UsuarioActual"];
+}
+
+<p class="text-muted mb-1 small">Proyecto: <strong>@ViewBag.NombreProyecto</strong></p>
+<h1 class="h3 mb-1" style="color:#16224E; font-weight:700;">Tablero — @sprint.Nombre</h1>
+<p class="text-muted mb-4">
+    <a href="@Url.Action("Index", "Sprint", new { proyectoId = sprint.ProyectoId })" class="text-decoration-none">
+        ← Volver al Sprint
+    </a>
+</p>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!historiasDelSprint.Any())
+{
+    <div class="empty-state mb-4">
+        <h5 class="mb-2">Todavía no hay historias en el Sprint Backlog</h5>
+        <p class="mb-0">Agregá historias desde la pantalla del Sprint antes de crear tareas.</p>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h6 mb-3" style="color:#16224E;">Historias del Sprint — crear tarea técnica</h2>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var h in historiasDelSprint)
+                {
+                    <a href="@Url.Action("Crear", "Tablero", new { historiaId = h.Id, sprintId = sprint.Id })"
+                       class="btn btn-outline-brand btn-sm">
+                        + Tarea para <code>@h.Codigo</code>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row g-3">
+    @foreach (var columna in columnas)
+    {
+        var tareasColumna = Model.Where(t => t.Estado == columna).ToList();
+        <div class="col-12 col-md-6 col-lg">
+            <div class="mb-2 d-flex align-items-center justify-content-between">
+                <span class="badge @ScrumMvp.Helpers.EstadoTareaHelper.ClaseBadge(columna) rounded-pill px-3 py-2">
+                    @ScrumMvp.Helpers.EstadoTareaHelper.Etiqueta(columna)
+                </span>
+                <span class="text-muted small">@tareasColumna.Count</span>
+            </div>
+
+            <div class="d-flex flex-column gap-2">
+                @if (!tareasColumna.Any())
+                {
+                    <div class="empty-state py-3">
+                        <p class="mb-0 small">Sin tareas</p>
+                    </div>
+                }
+                @foreach (var t in tareasColumna)
+                {
+                    <div class="card shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <code class="text-muted small">@t.HistoriaCodigo</code>
+                                @if (t.Bloqueada)
+                                {
+                                    <span class="badge text-bg-danger">Bloqueada</span>
+                                }
+                            </div>
+                            <p class="fw-semibold mb-1" style="color:#16224E; font-size:.92rem;">@t.Titulo</p>
+
+                            @if (t.ResponsableId.HasValue)
+                            {
+                                <p class="text-muted small mb-2">
+                                    👤 @(t.ResponsableId == usuarioActual.Id ? "Vos" : t.ResponsableNombre)
+                                </p>
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("Tomar", "Tablero", new { sprintId = sprint.Id }, FormMethod.Post, new { @class = "mb-2" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("tareaId", t.Id)
+                                    <button type="submit" class="btn btn-sm btn-outline-brand py-0">Tomar tarea</button>
+                                }
+                            }
+
+                            using (Html.BeginForm("CambiarEstado", "Tablero", new { sprintId = sprint.Id }, FormMethod.Post))
+                            {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("tareaId", t.Id)
+                            @Html.DropDownList("nuevoEstado",
+                                     ScrumMvp.Helpers.EstadoTareaHelper.ComoLista(t.Estado),
+                                     new { @class = "form-select form-select-sm mt-1", onchange = "this.form.submit()" })
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
