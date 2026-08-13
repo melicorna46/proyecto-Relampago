@@ -20,8 +20,9 @@ namespace ScrumMvp.Data
             }
         }
 
-        // Se usa para mostrar los proyectos donde el usuario participa
-        // (por ahora, simplificado: los que él mismo creó).
+        // Se usa para mostrar los proyectos donde el usuario participa:
+        // los que él mismo creó, MÁS los que integra como miembro de un equipo
+        // (arreglo de Persona 2: antes solo traía los propios).
         public List<Proyecto> ObtenerPorCreador(int usuarioId)
         {
             using (var con = Db.GetConnection())
@@ -35,6 +36,12 @@ namespace ScrumMvp.Data
                            creado_por   AS CreadoPor
                     FROM proyecto
                     WHERE creado_por = @usuarioId
+                       OR id IN (
+                            SELECT e.proyecto_id
+                            FROM equipo e
+                            INNER JOIN equipo_miembro em ON em.equipo_id = e.id
+                            WHERE em.usuario_id = @usuarioId
+                       )
                     ORDER BY id DESC";
 
                 return new List<Proyecto>(con.Query<Proyecto>(sql, new { usuarioId }));
